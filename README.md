@@ -27,17 +27,18 @@ O agente segue o padrão **ReAct** (Reason + Act) implementado com **LangGraph**
 Pergunta do usuário
        │
        ▼
-  ┌──────────┐   tool_calls?   ┌──────────────────┐
-  │ LLM Node │ ──────────────► │  Tools Node (BQ) │
-  │ (GPT-4o) │                 │  executa SQL     │
-  └──────────┘                 └──────────────────┘
-       ▲                               │
-       │    resultado da tool          │
-       └───────────────────────────────┘
-             loop até resposta final
-                      │
-                      ▼
-            Insight em linguagem natural
+  ┌────────────────┐   tool_calls?   ┌──────────────────┐
+  │   LLM Node     │ ──────────────► │  Tools Node (BQ) │
+  │ (Gemini 2.0    │                 │  executa SQL     │
+  │     Flash)     │                 └──────────────────┘
+  └────────────────┘                          │
+       ▲                                      │
+       │      resultado da tool               │
+       └──────────────────────────────────────┘
+                  loop até resposta final
+                          │
+                          ▼
+                Insight em linguagem natural
 ```
 
 ### Fluxo detalhado
@@ -76,8 +77,8 @@ Todas as tools:
 | Camada | Tecnologia |
 |--------|-----------|
 | Web Framework | FastAPI 0.115 |
-| Orquestrador de IA | LangGraph 0.2 |
-| LLM | OpenAI GPT-4o (via LangChain) |
+| Orquestrador de IA | LangGraph 0.4 |
+| LLM | Google Gemini 2.0 Flash (via `langchain-google-genai`) |
 | Data Warehouse | Google BigQuery (cliente Python oficial) |
 | Validação | Pydantic v2 |
 | Servidor ASGI | Uvicorn |
@@ -86,9 +87,9 @@ Todas as tools:
 
 ## Pré-requisitos
 
-- Python 3.10+
-- Conta Google Cloud (gratuita) com acesso ao BigQuery
-- Chave de API da OpenAI
+- Python 3.13 (Windows: `winget install Python.Python.3.13`)
+- Conta Google Cloud (gratuita) com BigQuery API habilitada
+- Chave de API do **Google AI Studio** (gratuita) — obtida em https://aistudio.google.com/apikey
 
 ---
 
@@ -103,20 +104,23 @@ cd media-analyst-agent
 
 ### 2. Crie e ative um ambiente virtual
 
+> **Requisito:** Python 3.13 (a versão 3.14 ainda não tem suporte a pacotes como `pydantic-core`).  
+> Instale via winget: `winget install Python.Python.3.13`
+
 ```bash
-python -m venv .venv
+# Windows (PowerShell)
+py -3.13 -m venv .venv
+.venv\Scripts\Activate.ps1
 
 # Linux/macOS
+python3.13 -m venv .venv
 source .venv/bin/activate
-
-# Windows (PowerShell)
-.venv\Scripts\Activate.ps1
 ```
 
 ### 3. Instale as dependências
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt --prefer-binary
 ```
 
 ### 4. Configure as credenciais do Google Cloud
@@ -145,11 +149,13 @@ cp .env.example .env
 Edite o `.env`:
 
 ```env
-OPENAI_API_KEY=sk-...                        # sua chave OpenAI
-GOOGLE_APPLICATION_CREDENTIALS=/caminho/para/service-account.json
+GOOGLE_API_KEY=AIza...                       # AI Studio API Key
+GOOGLE_APPLICATION_CREDENTIALS=C:\caminho\para\service-account.json
 GCP_PROJECT_ID=seu-projeto-gcp               # ex: my-project-123456
-OPENAI_MODEL=gpt-4o                          # ou gpt-4o-mini para menor custo
+GEMINI_MODEL=gemini-2.0-flash                # ou gemini-1.5-flash / gemini-1.5-pro
 ```
+
+> **Nota:** o **Google AI Studio** (LLM) é independente do **Google Cloud BigQuery** — o primeiro usa uma API key simples, o segundo usa a service account. Você precisa configurar os dois.
 
 ---
 
