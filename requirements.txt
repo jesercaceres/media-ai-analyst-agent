@@ -1,0 +1,22 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+pydantic==2.11.4
+pydantic-settings==2.9.1
+
+# LangChain / LangGraph
+langchain==0.3.25
+langchain-google-genai==2.1.4
+langchain-core==0.3.58
+langgraph==0.4.5
+
+# Pino o langsmith a uma versão anterior ao 0.2.x para evitar a dependência
+# de zstandard, que não possui wheel para Python 3.14 e requer compilação MSVC.
+langsmith>=0.1.17,<0.2.0
+
+# Google BigQuery
+google-cloud-bigquery==3.31.0
+google-auth==2.40.1
+
+# Utilities
+python-dotenv==1.1.0
+httpx==0.28.1
