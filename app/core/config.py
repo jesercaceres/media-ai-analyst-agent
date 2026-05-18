@@ -7,7 +7,7 @@ class Settings(BaseSettings):
 
     # Google Gemini (LLM provider)
     google_api_key: str
-    gemini_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-2.5-flash"
     gemini_temperature: float = 0.0
 
     # Google Cloud / BigQuery
