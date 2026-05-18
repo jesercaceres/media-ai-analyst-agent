@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     # App
     app_title: str = "Media Analyst AI Agent"
-    app_version: str = "1.0.0"
+    app_version: str = "1.0.1"
     debug: bool = False
 
 
